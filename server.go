@@ -113,7 +113,7 @@ import (
 		system. Implementations are provided for most common systems.
 	*/
 	"github.com/go-kit/kit/sd"
-	/* Package lb implements the client-side load balancer pattern. */
+	/* 	Package lb implements the client-side load balancer pattern. */
 	"github.com/go-kit/kit/sd/lb"
 	/*
 		Package http provides a general purpose HTTP binding for endpoints.
@@ -176,6 +176,9 @@ var (
 	})
 )
 
+// In memory store for metrics
+var Responses [][]interface{}
+
 func init() {
 	prometheus.MustRegister(writeDuration)
 	prometheus.MustRegister(writeErrors)
@@ -187,6 +190,33 @@ func init() {
 	prometheus.MustRegister(readSamples)
 	prometheus.MustRegister(readCrateDuration)
 	prometheus.MustRegister(readCrateErrors)
+
+	// newResponse1 := []interface{}{
+	// 	map[string]interface{}{
+	// 		"le":       "+Inf",
+	// 		"region":   "eu-west-1",
+	// 		"instance": "localhost:9090",
+	// 		"job":      "prometheus",
+	// 		"__name__": "prometheus_tsdb_compaction_chunk_samples_bucket2",
+	// 	},
+	// 	json.Number("1529355153029"),
+	// 	json.Number("0"),
+	// }
+
+	// newResponse2 := []interface{}{
+	// 	map[string]interface{}{
+	// 		"le":       "+Inf",
+	// 		"region":   "eu-west-1",
+	// 		"instance": "localhost:9090",
+	// 		"job":      "prometheus",
+	// 		"__name__": "prometheus_tsdb_compaction_chunk_samples_bucket2",
+	// 	},
+	// 	json.Number("1529355153029"),
+	// 	json.Number("0"),
+	// }
+
+	// Responses = append(Responses, newResponse1)
+	// Responses = append(Responses, newResponse2)
 }
 
 // Escaping for strings for Crate.io SQL.
@@ -279,10 +309,10 @@ func responseToTimeseries(data *crateResponse) []*remote.TimeSeries {
 			// time.Sleep(5 * time.Second)
 			switch data.Cols[i] {
 			case "labels":
-				labels := value.(map[string]interface{})
+				labels := value.(model.Metric)
 				for k, v := range labels {
 					// lfoo -> foo.
-					metric[model.LabelName(k)] = model.LabelValue(v.(string))
+					metric[model.LabelName(k)] = model.LabelValue(v)
 				}
 			case "timestamp":
 				t, _ = value.(json.Number).Int64()
@@ -348,113 +378,7 @@ func (ca *redisAdapter) runQuery(q *remote.Query) ([]*remote.TimeSeries, error) 
 		"valueRaw",
 	}
 
-	/*Results:[timeseries:<
-	labels:<name:"__name__" value:"prometheus_tsdb_compaction_chunk_samples_bucket" >
-	labels:<name:"instance" value:"localhost:9090" >
-	labels:<name:"job" value:"prometheus" >
-	labels:<name:"le" value:"+Inf" >
-	labels:<name:"region" value:"eu-west-1" >
-	samples:<timestamp_ms:1529359077 >
-	samples:<timestamp_ms:1529359078 >
-	samples:<timestamp_ms:1529359078 >
-	samples:<timestamp_ms:1529359078 >
-	samples:<timestamp_ms:1529359079 >
-	samples:<timestamp_ms:1529359079 >
-	samples:<timestamp_ms:1529359079 >
-	samples:<timestamp_ms:1529359080 >
-	samples:<timestamp_ms:1529359080 >
-	samples:<timestamp_ms:1529359080 >
-	samples:<timestamp_ms:1529359080 >
-	samples:<timestamp_ms:1529359081 >
-	samples:<timestamp_ms:1529359081 >
-	samples:<timestamp_ms:1529359081 >
-	samples:<timestamp_ms:1529359082 >
-	samples:<timestamp_ms:1529359082 >
-	samples:<timestamp_ms:1529359082 > > ]*/
-
-	/*
-		timeseries:<
-			labels:<name:"__name__" value:"prometheus_tsdb_compaction_chunk_samples_bucket" >
-			labels:<name:"instance" value:"localhost:9090" >
-			labels:<name:"job" value:"prometheus" >
-			labels:<name:"le" value:"+Inf" >
-			samples:<timestamp_ms:1529355153029 >
-			samples:<timestamp_ms:1529355158029 >
-			samples:<timestamp_ms:1529355163029 >
-			samples:<timestamp_ms:1529355168029 >
-			samples:<timestamp_ms:1529355173029 >
-			samples:<timestamp_ms:1529355178029 >
-			samples:<timestamp_ms:1529355183029 >
-			samples:<timestamp_ms:1529355188029 >
-			samples:<timestamp_ms:1529355193029 >
-			samples:<timestamp_ms:1529355198029 >
-			samples:<timestamp_ms:1529355203029 >
-			samples:<timestamp_ms:1529355208029 >
-			samples:<timestamp_ms:1529355213029 >
-			samples:<timestamp_ms:1529355218029 >
-			samples:<timestamp_ms:1529355223029 >
-			samples:<timestamp_ms:1529355228029 >
-			samples:<timestamp_ms:1529355233029 >
-			samples:<timestamp_ms:1529355238029 >
-			samples:<timestamp_ms:1529355243029 >
-			samples:<timestamp_ms:1529355248029 >
-			samples:<timestamp_ms:1529355253029 >
-			samples:<timestamp_ms:1529355258029 >
-			samples:<timestamp_ms:1529355263029 >
-			samples:<timestamp_ms:1529355268029 >
-			samples:<timestamp_ms:1529355273029 >
-			samples:<timestamp_ms:1529355278029 >
-			samples:<timestamp_ms:1529355283029 >
-			samples:<timestamp_ms:1529355288029 >
-			samples:<timestamp_ms:1529355293029 >
-			samples:<timestamp_ms:1529355298029 >
-			samples:<timestamp_ms:1529355303029 >
-			samples:<timestamp_ms:1529355308029 >
-			samples:<timestamp_ms:1529355313029 >
-			samples:<timestamp_ms:1529355318029 >
-			samples:<timestamp_ms:1529355323029 >
-			samples:<timestamp_ms:1529355328029 >
-			samples:<timestamp_ms:1529355369098 >
-			samples:<timestamp_ms:1529355374098 >
-			samples:<timestamp_ms:1529355379098 >
-			samples:<timestamp_ms:1529355384098 >
-			samples:<timestamp_ms:1529355389098 >
-			samples:<timestamp_ms:1529355394098 >
-			samples:<timestamp_ms:1529355399098 >
-			samples:<timestamp_ms:1529355404098 >
-			samples:<timestamp_ms:1529355409098 >
-			samples:<timestamp_ms:1529355414098 >
-			samples:<timestamp_ms:1529355419098 >
-			samples:<timestamp_ms:1529355424098 >
-			samples:<timestamp_ms:1529355429098 >
-			samples:<timestamp_ms:1529355434098 >
-			samples:<timestamp_ms:1529355439098 > >
-	*/
-	response.Rows = [][]interface{}{
-		[]interface{}{
-			map[string]interface{}{
-				"le":       "+Inf",
-				"region":   "eu-west-1",
-				"instance": "localhost:9090",
-				"job":      "prometheus",
-				"__name__": "prometheus_tsdb_compaction_chunk_samples_bucket",
-			},
-			json.Number("1529355153029"),
-			json.Number("0"),
-		},
-		[]interface{}{
-			map[string]interface{}{
-				"le":       "+Inf",
-				"region":   "eu-west-1",
-				"instance": "localhost:9090",
-				"job":      "prometheus",
-				"__name__": "prometheus_tsdb_compaction_chunk_samples_bucket",
-			},
-			// json.Number("1529355159029"),
-			json.Number("1529355153029"),
-			json.Number("0"),
-		},
-	}
+	response.Rows = Responses
 
 	timeseries := responseToTimeseries(&response)
 	return timeseries, nil
@@ -520,8 +444,6 @@ func (ca *redisAdapter) handleRead(w http.ResponseWriter, r *http.Request) {
 		}
 	*/
 
-	fmt.Println(req)
-
 	// May only handle a single query. Early return otherwise.
 	if len(req.Queries) != 1 {
 		log.Error("More than one query sent.")
@@ -540,7 +462,7 @@ func (ca *redisAdapter) handleRead(w http.ResponseWriter, r *http.Request) {
 			{Timeseries: result},
 		},
 	}
-	fmt.Printf("%+v\n", resp)
+
 	data, err := proto.Marshal(&resp)
 	if err != nil {
 		log.With("err", err).Error("Failed to marshal response.")
@@ -593,6 +515,25 @@ func writesToCrateRequest(req *remote.WriteRequest) *crateRequest {
 	return request
 }
 
+func writesToInternalStore(req *remote.WriteRequest) {
+	for _, ts := range req.Timeseries {
+		metric := make(model.Metric, len(ts.Labels))
+		for _, l := range ts.Labels {
+			metric[model.LabelName(l.Name)] = model.LabelValue(l.Value)
+		}
+
+		for _, s := range ts.Samples {
+
+			newResponse := []interface{}{
+				metric,
+				json.Number(s.TimestampMs),
+				json.Number(fmt.Sprintf("%f", s.Value)),
+			}
+			Responses = append(Responses, newResponse)
+		}
+	}
+}
+
 func (ca *redisAdapter) handleWrite(w http.ResponseWriter, r *http.Request) {
 	timer := prometheus.NewTimer(writeDuration)
 	defer timer.ObserveDuration()
@@ -618,10 +559,47 @@ func (ca *redisAdapter) handleWrite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := writesToCrateRequest(&req)
+	/*
+	   {Timeseries:[
+	   	labels:<name:"__name__" value:"http_request_size_bytes" >
+	   	labels:<name:"handler" value:"query" >
+	   	labels:<name:"instance" value:"localhost:9090" >
+	   	labels:<name:"job" value:"prometheus" >
+	   	labels:<name:"quantile" value:"0.99" >
+	   	samples:<value:nan timestamp_ms:1529384498758 >
+	   	labels:<name:"__name__" value:"http_request_size_bytes_sum" >
+	   	labels:<name:"handler" value:"query" >
+	   	labels:<name:"instance" value:"localhost:9090" >
+	   	labels:<name:"job" value:"prometheus" >
+	   	samples:<timestamp_ms:1529384498758 >
+	   	labels:<name:"__name__" value:"http_request_size_bytes_count" >
+	   	labels:<name:"handler" value:"query" >
+	   	labels:<name:"instance" value:"localhost:9090" >
+	   	labels:<name:"job" value:"prometheus" >
+	   	samples:<timestamp_ms:1529384498758 >
+	   	labels:<name:"__name__" value:"http_request_size_bytes" >
+	   	labels:<name:"handler" value:"query_range" >
+	   	labels:<name:"instance" value:"localhost:9090" >
+	   	labels:<name:"job" value:"prometheus" >
+	   	labels:<name:"quantile" value:"0.5" >
+	   	samples:<value:nan timestamp_ms:1529384498758 >
+	   	labels:<name:"__name__" value:"http_request_size_bytes" >
+	   	labels:<name:"handler" value:"query_range" >
+	   	labels:<name:"instance" value:"localhost:9090" >
+	   	labels:<name:"job" value:"prometheus" >
+	   	labels:<name:"quantile" value:"0.9" >
+	   	samples:<value:nan timestamp_ms:1529384498758 >
+	   	labels:<name:"__name__" value:"http_request_size_bytes" >
+
+	*/
+	// fmt.Println("heres the write request")
+	// fmt.Printf("%+v\n", req)
+
+	// request := writesToCrateRequest(&req)
+	writesToInternalStore(&req)
 
 	writeTimer := prometheus.NewTimer(writeCrateDuration)
-	_, err = ca.ep(context.Background(), request)
+	// _, err = ca.ep(context.Background(), request)
 	writeTimer.ObserveDuration()
 	if err != nil {
 		writeCrateErrors.Inc()
