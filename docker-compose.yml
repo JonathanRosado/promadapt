@@ -8,10 +8,18 @@ services:
      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
      - '--config.file=/etc/prometheus/prometheus.yml'
-    image: quay.io/prometheus/prometheus
+     - '--log.level=debug'
+    image: quay.io/prometheus/prometheus:v2.0.0
     ports:
      - "9090:9090"
   redis:
     image: redis
     ports:
      - "6379:6379"
+  RedisPrometheusAdapter:
+    image: ubuntu
+    ports:
+     - "9091:9783"
+    volumes:
+     - ./RedisPrometheusAdapter:/RedisPrometheusAdapter
+    command: ./RedisPrometheusAdapter

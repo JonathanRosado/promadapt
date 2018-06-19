@@ -1,3 +1,90 @@
+/*
+	Metrics to be saved in Redis
+
+	CREATE TABLE "metrics" (
+		"timestamp" TIMESTAMP,
+		"labels_hash" STRING,
+		"labels" OBJECT(DYNAMIC),
+		"value" DOUBLE,
+		"valueRaw" LONG,
+		PRIMARY KEY ("timestamp", "labels_hash")
+	);
+
+	RedisPrometheusAdapter_1  | Request shown below
+RedisPrometheusAdapter_1  | {Queries:[start_timestamp_ms:1529355148601 end_timestamp_ms:1529355448601 matchers:<name:"__name__" value:"prometheus_tsdb_compaction_chunk_samples_bucket" > ]}
+RedisPrometheusAdapter_1  | Request shown below
+RedisPrometheusAdapter_1  |
+{Results:[
+	timeseries:<
+	labels:<name:"__name__" value:"prometheus_tsdb_compaction_chunk_samples_bucket" >
+	labels:<name:"instance" value:"localhost:9090" >
+	labels:<name:"job" value:"prometheus" >
+	labels:<name:"le" value:"+Inf" >
+	samples:<timestamp_ms:1529355153029 >
+	samples:<timestamp_ms:1529355158029 >
+	samples:<timestamp_ms:1529355163029 >
+	samples:<timestamp_ms:1529355168029 >
+	samples:<timestamp_ms:1529355173029 >
+	samples:<timestamp_ms:1529355178029 >
+	samples:<timestamp_ms:1529355183029 >
+	samples:<timestamp_ms:1529355188029 >
+	samples:<timestamp_ms:1529355193029 >
+	samples:<timestamp_ms:1529355198029 >
+	samples:<timestamp_ms:1529355203029 >
+	samples:<timestamp_ms:1529355208029 >
+	samples:<timestamp_ms:1529355213029 >
+	samples:<timestamp_ms:1529355218029 >
+	samples:<timestamp_ms:1529355223029 >
+	samples:<timestamp_ms:1529355228029 >
+	samples:<timestamp_ms:1529355233029 >
+	samples:<timestamp_ms:1529355238029 >
+	samples:<timestamp_ms:1529355243029 >
+	samples:<timestamp_ms:1529355248029 >
+	samples:<timestamp_ms:1529355253029 >
+	samples:<timestamp_ms:1529355258029 >
+	samples:<timestamp_ms:1529355263029 >
+	samples:<timestamp_ms:1529355268029 >
+	samples:<timestamp_ms:1529355273029 >
+	samples:<timestamp_ms:1529355278029 >
+	samples:<timestamp_ms:1529355283029 >
+	samples:<timestamp_ms:1529355288029 >
+	samples:<timestamp_ms:1529355293029 >
+	samples:<timestamp_ms:1529355298029 >
+	samples:<timestamp_ms:1529355303029 >
+	samples:<timestamp_ms:1529355308029 >
+	samples:<timestamp_ms:1529355313029 >
+	samples:<timestamp_ms:1529355318029 >
+	samples:<timestamp_ms:1529355323029 >
+	samples:<timestamp_ms:1529355328029 >
+	samples:<timestamp_ms:1529355369098 >
+	samples:<timestamp_ms:1529355374098 >
+	samples:<timestamp_ms:1529355379098 >
+	samples:<timestamp_ms:1529355384098 >
+	samples:<timestamp_ms:1529355389098 >
+	samples:<timestamp_ms:1529355394098 >
+	samples:<timestamp_ms:1529355399098 >
+	samples:<timestamp_ms:1529355404098 >
+	samples:<timestamp_ms:1529355409098 >
+	samples:<timestamp_ms:1529355414098 >
+	samples:<timestamp_ms:1529355419098 >
+	samples:<timestamp_ms:1529355424098 >
+	samples:<timestamp_ms:1529355429098 >
+	samples:<timestamp_ms:1529355434098 >
+	samples:<timestamp_ms:1529355439098 > >
+
+	timeseries:<
+	labels:<name:"__name__" value:"http_requests_total" >
+	labels:<name:"cpu" value:"real-time" >
+	labels:<name:"instance" value:"di-9990.net.com">
+	labels:<name:"job" value:"prometheus" >
+	labels:<name:"region" value:"eu-west-1" >
+	samples:<value:1.2e-322 timestamp_ms:1529302504 >
+	samples:<value:1.33e-322 timestamp_ms:1529302507 >
+	samples:<value:1.04e-322 timestamp_ms:1529302510 >
+	samples:<value:1.04e-322 timestamp_ms:1529302513 > >
+
+*/
+
 package main
 
 import (
@@ -189,6 +276,7 @@ func responseToTimeseries(data *crateResponse) []*remote.TimeSeries {
 		var v float64
 		var t int64
 		for i, value := range row {
+			// time.Sleep(5 * time.Second)
 			switch data.Cols[i] {
 			case "labels":
 				labels := value.(map[string]interface{})
@@ -259,30 +347,112 @@ func (ca *redisAdapter) runQuery(q *remote.Query) ([]*remote.TimeSeries, error) 
 		"timestamp",
 		"valueRaw",
 	}
+
+	/*Results:[timeseries:<
+	labels:<name:"__name__" value:"prometheus_tsdb_compaction_chunk_samples_bucket" >
+	labels:<name:"instance" value:"localhost:9090" >
+	labels:<name:"job" value:"prometheus" >
+	labels:<name:"le" value:"+Inf" >
+	labels:<name:"region" value:"eu-west-1" >
+	samples:<timestamp_ms:1529359077 >
+	samples:<timestamp_ms:1529359078 >
+	samples:<timestamp_ms:1529359078 >
+	samples:<timestamp_ms:1529359078 >
+	samples:<timestamp_ms:1529359079 >
+	samples:<timestamp_ms:1529359079 >
+	samples:<timestamp_ms:1529359079 >
+	samples:<timestamp_ms:1529359080 >
+	samples:<timestamp_ms:1529359080 >
+	samples:<timestamp_ms:1529359080 >
+	samples:<timestamp_ms:1529359080 >
+	samples:<timestamp_ms:1529359081 >
+	samples:<timestamp_ms:1529359081 >
+	samples:<timestamp_ms:1529359081 >
+	samples:<timestamp_ms:1529359082 >
+	samples:<timestamp_ms:1529359082 >
+	samples:<timestamp_ms:1529359082 > > ]*/
+
+	/*
+		timeseries:<
+			labels:<name:"__name__" value:"prometheus_tsdb_compaction_chunk_samples_bucket" >
+			labels:<name:"instance" value:"localhost:9090" >
+			labels:<name:"job" value:"prometheus" >
+			labels:<name:"le" value:"+Inf" >
+			samples:<timestamp_ms:1529355153029 >
+			samples:<timestamp_ms:1529355158029 >
+			samples:<timestamp_ms:1529355163029 >
+			samples:<timestamp_ms:1529355168029 >
+			samples:<timestamp_ms:1529355173029 >
+			samples:<timestamp_ms:1529355178029 >
+			samples:<timestamp_ms:1529355183029 >
+			samples:<timestamp_ms:1529355188029 >
+			samples:<timestamp_ms:1529355193029 >
+			samples:<timestamp_ms:1529355198029 >
+			samples:<timestamp_ms:1529355203029 >
+			samples:<timestamp_ms:1529355208029 >
+			samples:<timestamp_ms:1529355213029 >
+			samples:<timestamp_ms:1529355218029 >
+			samples:<timestamp_ms:1529355223029 >
+			samples:<timestamp_ms:1529355228029 >
+			samples:<timestamp_ms:1529355233029 >
+			samples:<timestamp_ms:1529355238029 >
+			samples:<timestamp_ms:1529355243029 >
+			samples:<timestamp_ms:1529355248029 >
+			samples:<timestamp_ms:1529355253029 >
+			samples:<timestamp_ms:1529355258029 >
+			samples:<timestamp_ms:1529355263029 >
+			samples:<timestamp_ms:1529355268029 >
+			samples:<timestamp_ms:1529355273029 >
+			samples:<timestamp_ms:1529355278029 >
+			samples:<timestamp_ms:1529355283029 >
+			samples:<timestamp_ms:1529355288029 >
+			samples:<timestamp_ms:1529355293029 >
+			samples:<timestamp_ms:1529355298029 >
+			samples:<timestamp_ms:1529355303029 >
+			samples:<timestamp_ms:1529355308029 >
+			samples:<timestamp_ms:1529355313029 >
+			samples:<timestamp_ms:1529355318029 >
+			samples:<timestamp_ms:1529355323029 >
+			samples:<timestamp_ms:1529355328029 >
+			samples:<timestamp_ms:1529355369098 >
+			samples:<timestamp_ms:1529355374098 >
+			samples:<timestamp_ms:1529355379098 >
+			samples:<timestamp_ms:1529355384098 >
+			samples:<timestamp_ms:1529355389098 >
+			samples:<timestamp_ms:1529355394098 >
+			samples:<timestamp_ms:1529355399098 >
+			samples:<timestamp_ms:1529355404098 >
+			samples:<timestamp_ms:1529355409098 >
+			samples:<timestamp_ms:1529355414098 >
+			samples:<timestamp_ms:1529355419098 >
+			samples:<timestamp_ms:1529355424098 >
+			samples:<timestamp_ms:1529355429098 >
+			samples:<timestamp_ms:1529355434098 >
+			samples:<timestamp_ms:1529355439098 > >
+	*/
 	response.Rows = [][]interface{}{
 		[]interface{}{
 			map[string]interface{}{
-				"instance": "di-9990.net.com",
-				"cpu":      "real-time",
+				"le":       "+Inf",
+				"region":   "eu-west-1",
+				"instance": "localhost:9090",
+				"job":      "prometheus",
+				"__name__": "prometheus_tsdb_compaction_chunk_samples_bucket",
 			},
-			"1483228810000",
-			24,
+			json.Number("1529355153029"),
+			json.Number("0"),
 		},
 		[]interface{}{
 			map[string]interface{}{
-				"instance": "di-9990.net.com",
-				"cpu":      "real-time",
+				"le":       "+Inf",
+				"region":   "eu-west-1",
+				"instance": "localhost:9090",
+				"job":      "prometheus",
+				"__name__": "prometheus_tsdb_compaction_chunk_samples_bucket",
 			},
-			"1483228810000",
-			27,
-		},
-		[]interface{}{
-			map[string]interface{}{
-				"instance": "di-9990.net.com",
-				"cpu":      "real-time",
-			},
-			"1483228810000",
-			21,
+			// json.Number("1529355159029"),
+			json.Number("1529355153029"),
+			json.Number("0"),
 		},
 	}
 
@@ -335,6 +505,23 @@ func (ca *redisAdapter) handleRead(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/*
+		req looks like
+		{
+			[
+				start_timestamp_ms:1529293152950
+				end_timestamp_ms:1529293452950
+				matchers:<name:"job" value:"prometheus" >
+				matchers:<name:"group" value:"canary" >
+				matchers:<name:"__name__" value:"http_requests_total" >
+				matchers:<name:"region" value:"eu-west-1" >
+				matchers:<name:"env" value:"prod" >
+			]
+		}
+	*/
+
+	fmt.Println(req)
+
 	// May only handle a single query. Early return otherwise.
 	if len(req.Queries) != 1 {
 		log.Error("More than one query sent.")
@@ -353,6 +540,7 @@ func (ca *redisAdapter) handleRead(w http.ResponseWriter, r *http.Request) {
 			{Timeseries: result},
 		},
 	}
+	fmt.Printf("%+v\n", resp)
 	data, err := proto.Marshal(&resp)
 	if err != nil {
 		log.With("err", err).Error("Failed to marshal response.")
